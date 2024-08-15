@@ -132,6 +132,7 @@ def get_rendering_environment(xsd_namespaces, module='soapfish'):
         else:
             return f"__name__ + '.{name}'"
 
+
     keywords = set(keyword.kwlist)
 
     env = Environment(

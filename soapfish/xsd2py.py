@@ -117,6 +117,23 @@ def _reorder_complexTypes(schema):
     schema.complexTypes.sort(key=functools.cmp_to_key(_cmp))
 
 
+def _reorder_complexTypes2(schema):
+    """Reorder complexTypes to prevent using object before defining it."""
+    weights = {}
+    for n, complex_type in enumerate(schema.complexTypes):
+        children_len = 0
+        if complex_type.all:
+            children_len += len(complex_type.all.elements)
+        if complex_type.choice:
+            children_len += len(complex_type.choice.elements)
+        if complex_type.sequence:
+            children_len += len(complex_type.sequence.elements)
+
+        weights[complex_type.name] = children_len
+
+    schema.complexTypes.sort(key=lambda x: weights[x.name])
+
+
 def schema_to_py(schema, xsd_namespaces,
                  known_paths=None, known_types=None, location=None,
                  parent_namespace=None, cwd=None, base_path=None,
@@ -127,6 +144,7 @@ def schema_to_py(schema, xsd_namespaces,
         rewrite_paths(schema, cwd, base_path)
 
     _reorder_complexTypes(schema)
+    _reorder_complexTypes2(schema)
 
     if known_paths is None:
         known_paths = []
