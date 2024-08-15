@@ -79,9 +79,30 @@ class {{ name|capitalize }}({{ restriction|type(known_types) }}):
 {%- elif restriction.maxExclusive %}
     maxExclusive = r'{{ restriction.maxExclusive.value }}'
 {%- endif %}
+{%- if restriction.fractionDigits %}
+    fractionDigits = {{ restriction.fractionDigits.value }}
+{% endif %}
+{%- if restriction.totalDigits %}
+    totalDigits = {{ restriction.totalDigits.value }}
+{% endif %}
+{%- if restriction.length %}
+    length = {{ restriction.length.value }}
+{% endif %}
+{%- if restriction.minLength %}
+    minLength = {{ restriction.minLength.value }}
+{% endif %}
+{%- if restriction.maxLength %}
+    maxLength = {{ restriction.maxLength.value }}
+{% endif %}
+{%- if restriction.whiteSpace %}
+    whiteSpace = {{ restriction.whiteSpace.value }}
+{% endif %}
 {%- if not restriction.enumerations and not restriction.pattern
         and not restriction.minInclusive and not restriction.minExclusive
-        and not restriction.maxInclusive and not restriction.maxExclusive %}
+        and not restriction.maxInclusive and not restriction.maxExclusive
+        and not restriction.fractionDigits and not restriction.totalDigits
+        and not restriction.length and not restriction.whiteSpace
+        and not restriction.minLength and not restriction.maxLength %}
     pass
 {%- endif %}
 {# [blank line] #}
@@ -90,6 +111,12 @@ class {{ name|capitalize }}({{ restriction|type(known_types) }}):
 
 {% macro render_complexType(class_name, content, known_types=None) -%}
 {%- set ct = content %}
+{%- for element in content.sequence.elements -%}
+{%- if element.complexType %}
+{{ render_complexType(element.name, element.complexType, known_types) }}
+{%- do known_types.append(element.name|capitalize) -%}
+{%- endif %}
+{%- endfor %}
 {%- if not ct.sequence and not ct.complexContent %}
 class {{ class_name|capitalize }}(xsd.ComplexType):
     pass

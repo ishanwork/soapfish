@@ -31,6 +31,7 @@ from soapfish import xsd
 {#- Attribute Groups -#}
 {%- for attrGroup in schema.attributeGroups %}
 {{ lib.render_xsd_AttributeGroup(attrGroup, known_types) }}
+{%- do known_types.append(attrGroup.name|capitalize) -%}
 {%- endfor %}
 {#- Groups -#}
 {%- for group in schema.groups %}

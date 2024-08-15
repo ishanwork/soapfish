@@ -10,8 +10,8 @@ from urllib.parse import urljoin
 
 from lxml import etree
 
-from . import xsdspec
-from .utils import find_xsd_namespaces, get_rendering_environment, open_document, resolve_location
+from soapfish import xsdspec
+from soapfish.utils import find_xsd_namespaces, get_rendering_environment, open_document, resolve_location
 
 logger = logging.getLogger('soapfish')
 
