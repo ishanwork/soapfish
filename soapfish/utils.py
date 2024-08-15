@@ -111,6 +111,8 @@ def get_rendering_environment(xsd_namespaces, module='soapfish'):
             elif obj.simpleType:
                 # FIXME: Determine how to handle embedded types...
                 raise NotImplementedError('Unable to handle embedded type.')
+            elif obj.complexType:
+                qname = obj.name
         elif isinstance(obj, (xsdspec.Extension, xsdspec.Restriction)):
             if obj.base:
                 qname = obj.base
