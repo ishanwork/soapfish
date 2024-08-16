@@ -22,6 +22,7 @@ from soapfish import xsd
 {%- for st in schema.simpleTypes %}
 {%- if st.restriction %}
 {{ lib.render_xsd_Restriction(st.name, st.restriction, known_types) }}
+{%- do known_types.append(st.name|capitalize) %}
 {%- endif %}
 {%- if st.list %}
 {{ lib.render_xsd_List(st.name, known_types) }}

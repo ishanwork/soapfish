@@ -82,6 +82,8 @@ def get_rendering_environment(xsd_namespaces, module='soapfish'):
     """Return a rendering environment to use with code generation templates."""
     from . import soap, wsdl, xsd, xsdspec
 
+    def lowercase(value: str):
+        return value[0].lower() + value[1:]
     def capitalize(value):
         return value[0].upper() + value[1:]
 
@@ -132,8 +134,13 @@ def get_rendering_environment(xsd_namespaces, module='soapfish'):
         else:
             return f"__name__ + '.{name}'"
 
-
     keywords = set(keyword.kwlist)
+
+    def fix_keywords(name: str, known_types=[]):
+        name = lowercase(str(name))
+        if name in keywords or name in known_types:
+            return f'_{name}'
+        return name
 
     env = Environment(
         extensions=['jinja2.ext.do', 'jinja2.ext.loopcontrols'],
@@ -141,7 +148,7 @@ def get_rendering_environment(xsd_namespaces, module='soapfish'):
     )
     env.filters.update(
         capitalize=capitalize,
-        fix_keyword=lambda x: f'_{x}' if str(x) in keywords else str(x),
+        fix_keyword=fix_keywords,
         max_occurs=lambda x: 'xsd.UNBOUNDED' if x is xsd.UNBOUNDED else str(x),
         remove_namespace=remove_namespace,
         type=get_type,
