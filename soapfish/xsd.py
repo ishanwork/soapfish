@@ -966,12 +966,12 @@ class ComplexType(Type, metaclass=Complex_PythonType):
 
         is_choice = (instance._meta.cls.INDICATOR == Choice)
         for field in instance._meta.fields:
-            if is_choice:
-                if not cls._is_matching_element(field, xmlelement):
-                    continue
-                subelements = [xmlelement]
-            else:
-                subelements = cls._find_subelement(field, xmlelement)
+            # if is_choice:
+            #     if not cls._is_matching_element(field, xmlelement):
+            #         continue
+            #     subelements = [xmlelement]
+            # else:
+            subelements = cls._find_subelement(field, xmlelement)
             for subelement in subelements:
                 field.parse(instance, field._name, subelement)
             if is_choice:
