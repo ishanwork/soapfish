@@ -119,17 +119,50 @@ def _reorder_complexTypes(schema):
 
 def _reorder_complexTypes2(schema):
     """Reorder complexTypes to prevent using object before defining it."""
-    weights = {}
-    for n, complex_type in enumerate(schema.complexTypes):
-        children_len = 0
-        if complex_type.all:
-            children_len += len(complex_type.all.elements)
-        if complex_type.choice:
-            children_len += len(complex_type.choice.elements)
-        if complex_type.sequence:
-            children_len += len(complex_type.sequence.elements)
+    dependencies: dict[str, set[str]] = {}
+    weights: dict[str, int] = {}
 
-        weights[complex_type.name] = children_len
+    def update_dependencies(name: str, weight: int):
+        weights[name] = weight
+        for nm in dependencies.get(name, []):
+            update_dependencies(nm, weight + 1)
+
+    def get_type(element):
+        qname = None
+        if isinstance(element, xsdspec.Element):
+            if element.ref:
+                qname = element.ref
+            elif element.type:
+                qname = element.type
+        if not qname:
+            return None
+        ns, name = qname.split(':', 1) if ':' in qname else (None, qname)
+        if ns is None:
+            return None
+        name = name[0].upper() + name[1:]
+        return name
+
+    def recurse_elements(name: str, weight: int, complexElement):
+        elements = []
+        if complexElement.all:
+            elements.extend(complexElement.all.elements)
+        if complexElement.sequence:
+            elements.extend(complexElement.sequence.elements)
+        if complexElement.choice:
+            elements.extend(complexElement.choice.elements)
+        for element in elements:
+            if element.complexType:
+                recurse_elements(name, weight, element.complexType)
+            el_type = get_type(element)
+            if el_type is not None:
+                if el_type not in dependencies:
+                    dependencies[el_type] = set()
+                dependencies[el_type].add(name)
+            update_dependencies(element.name, weight)
+
+    for n, complex_type in enumerate(schema.complexTypes):
+        update_dependencies(complex_type.name, n)
+        recurse_elements(complex_type.name, n, complex_type)
 
     schema.complexTypes.sort(key=lambda x: weights[x.name])
 
