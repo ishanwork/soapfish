@@ -972,10 +972,12 @@ class ComplexType(Type, metaclass=Complex_PythonType):
             #     subelements = [xmlelement]
             # else:
             subelements = cls._find_subelement(field, xmlelement)
+            if is_choice:
+                assert len(subelements) == 1
             for subelement in subelements:
                 field.parse(instance, field._name, subelement)
-            if is_choice:
-                break
+            # if is_choice:
+            #     break
 
         for group in instance._meta.groups:
             group.parse(instance, group._name, xmlelement)
