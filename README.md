@@ -19,7 +19,7 @@ Soapfish
 [![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
 
 **This project is not actively maintained. If you only need a dynamic client using a predefined WSDL rather than
-generated code, it is recommended that you check out [Zeep](https://pypi.org/project/zeep/).**
+generated code, it is recommended that you check out [XSData](https://xsdata.readthedocs.io/en/latest/).**
 
 Introduction
 ------------
